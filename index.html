@@ -1,495 +1,166 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkyGlass</title>
-  <meta name="theme-color" content="#4f8cff" />
-  <style>
-    :root{
-      --glass: rgba(255,255,255,0.16);
-      --glass-border: rgba(255,255,255,0.18);
-      --text: rgba(255,255,255,0.96);
-      --sub: rgba(255,255,255,0.74);
-      --soft: rgba(255,255,255,0.10);
-      --shadow: 0 10px 30px rgba(0,0,0,0.15);
-      --radius: 24px;
-    }
-
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,0.20), transparent 30%),
-        linear-gradient(180deg, #5aa2ff 0%, #6588ff 35%, #7a69f8 100%);
-      background-attachment: fixed;
-    }
-
-    .app {
-      max-width: 460px;
-      margin: 0 auto;
-      padding: 18px 16px 32px;
-    }
-
-    .header {
-      padding: 16px 6px 8px;
-      text-align: center;
-    }
-
-    .city {
-      font-size: 34px;
-      font-weight: 500;
-      letter-spacing: -0.5px;
-    }
-
-    .temp {
-      font-size: 96px;
-      line-height: 0.95;
-      font-weight: 200;
-      letter-spacing: -3px;
-      margin: 4px 0;
-    }
-
-    .summary, .meta {
-      color: var(--sub);
-      font-size: 17px;
-    }
-
-    .meta { margin-top: 6px; }
-
-    .glass {
-      margin-top: 14px;
-      background: var(--glass);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .glass h3 {
-      margin: 0;
-      padding: 14px 16px 10px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--sub);
-      letter-spacing: 0.2px;
-    }
-
-    .hourly {
-      display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      padding: 0 14px 14px;
-      scroll-snap-type: x proximity;
-    }
-
-    .hourly::-webkit-scrollbar { display: none; }
-
-    .hour {
-      min-width: 66px;
-      padding: 12px 8px;
-      border-radius: 18px;
-      background: var(--soft);
-      text-align: center;
-      scroll-snap-align: start;
-    }
-
-    .hour .time {
-      font-size: 12px;
-      color: var(--sub);
-      margin-bottom: 8px;
-    }
-
-    .hour .icon {
-      font-size: 22px;
-      margin-bottom: 8px;
-    }
-
-    .hour .t {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .daily {
-      padding: 0 14px 8px;
-    }
-
-    .day-row {
-      display: grid;
-      grid-template-columns: 64px 28px 40px 1fr 42px;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 2px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .day-row:first-child { border-top: 0; }
-
-    .day-name { font-size: 15px; }
-    .day-low  { color: var(--sub); text-align: right; }
-    .day-high { text-align: right; }
-
-    .track {
-      position: relative;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.18);
-      overflow: hidden;
-    }
-
-    .fill {
-      position: absolute;
-      inset: 0 auto 0 0;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.92);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 14px;
-    }
-
-    .metric {
-      background: var(--glass);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      border: 1px solid var(--glass-border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 16px;
-      min-height: 120px;
-    }
-
-    .metric .label {
-      color: var(--sub);
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-
-    .metric .value {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .metric .note {
-      color: var(--sub);
-      font-size: 13px;
-      margin-top: 8px;
-    }
-
-    .footer-note {
-      color: rgba(255,255,255,0.65);
-      font-size: 12px;
-      text-align: center;
-      margin-top: 16px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 18px;
-      padding: 12px 14px;
-      background: rgba(255,255,255,0.18);
-      color: white;
-      font: inherit;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-    }
-
-    .status {
-      margin-top: 10px;
-      text-align: center;
-      color: var(--sub);
-      font-size: 14px;
-      min-height: 20px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Ultimate SkyGlass</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{--glass:rgba(255,255,255,.15);--border:rgba(255,255,255,.18);--sub:rgba(255,255,255,.72)}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:white;background:linear-gradient(180deg,#4e9cff,#675cff,#2b1f68)}
+.app{max-width:500px;margin:auto;padding:16px}
+.hero{text-align:center;padding:18px 8px}
+.city{font-size:30px;font-weight:700}
+.temp{font-size:96px;font-weight:200;letter-spacing:-4px}
+.summary{font-size:18px;font-weight:600}
+.meta,.status,.note{color:var(--sub);font-size:13px}
+button{border:1px solid var(--border);background:rgba(255,255,255,.16);color:white;border-radius:16px;padding:10px 14px;margin:4px;font:inherit}
+.card{background:var(--glass);border:1px solid var(--border);backdrop-filter:blur(24px);border-radius:24px;margin-top:14px;padding:14px;box-shadow:0 14px 35px rgba(0,0,0,.18)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.value{font-size:25px;font-weight:800}
+#map{height:330px;border-radius:22px;margin-top:10px}
+.hourly{display:flex;gap:10px;overflow-x:auto}
+.hour{min-width:76px;background:rgba(255,255,255,.1);border-radius:18px;padding:10px;text-align:center}
+.alert.ok{background:rgba(60,220,150,.16)}
+.alert.warn{background:rgba(255,190,60,.22)}
+.alert.bad{background:rgba(255,80,80,.24);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{transform:scale(1.02)}}
+.timeline{width:100%}
+</style>
 </head>
 <body>
-  <main class="app">
-    <section class="header">
-      <div class="city" id="city">Konum alınıyor…</div>
-      <div class="temp" id="temp">--°</div>
-      <div class="summary" id="summary">Hava durumu yükleniyor</div>
-      <div class="meta" id="meta">G: --° / D: --° · Hissedilen --°</div>
+<main class="app">
+<section class="hero">
+  <div class="city" id="city">Konum alınıyor…</div>
+  <div id="icon" style="font-size:38px">☀️</div>
+  <div class="temp" id="temp">--°</div>
+  <div class="summary" id="summary">Yükleniyor</div>
+  <div class="meta" id="meta">Hissedilen --°</div>
+  <button onclick="initLocation()">Konumdan Getir</button>
+  <button onclick="refresh()">Yenile</button>
+  <div class="status" id="status"></div>
+</section>
 
-      <div class="actions" style="justify-content:center;">
-        <button id="locBtn">Konumdan getir</button>
-      </div>
-      <div class="status" id="status"></div>
-    </section>
+<section class="card alert ok" id="alertBox">
+  <b>⚠️ Akıllı Uyarı</b>
+  <div class="note" id="smartAlert">Veri bekleniyor…</div>
+</section>
 
-    <section class="glass">
-      <h3>SAATLİK TAHMİN</h3>
-      <div class="hourly" id="hourly"></div>
-    </section>
+<section class="card">
+  <b>🗺️ Animasyonlu Yağış Radarı</b>
+  <div id="map"></div>
+  <div style="text-align:center;margin-top:10px">
+    <button onclick="prevFrame()">⏪</button>
+    <button onclick="togglePlay()" id="playBtn">⏸</button>
+    <button onclick="nextFrame()">⏩</button>
+  </div>
+  <input class="timeline" id="timeline" type="range" min="0" value="0" oninput="setFrame(this.value)">
+</section>
 
-    <section class="glass">
-      <h3>10 GÜNLÜK TAHMİN</h3>
-      <div class="daily" id="daily"></div>
-    </section>
+<section class="card">
+  <b>⏱️ Saatlik Tahmin</b>
+  <div class="hourly" id="hourly"></div>
+</section>
 
-    <section class="grid">
-      <article class="metric">
-        <div class="label">💧 Nem</div>
-        <div class="value" id="humidity">--%</div>
-        <div class="note">Anlık bağıl nem</div>
-      </article>
+<section class="grid">
+  <div class="card"><div>💨 Rüzgar</div><div class="value" id="wind">--</div><div class="note" id="windDir">--</div></div>
+  <div class="card"><div>🌧️ Yağış</div><div class="value" id="rain">--</div><div class="note">Anlık</div></div>
+  <div class="card"><div>☀️ UV</div><div class="value" id="uv">--</div><div class="note" id="uvNote">--</div></div>
+  <div class="card"><div>💧 Nem</div><div class="value" id="humidity">--</div><div class="note">Bağıl nem</div></div>
+  <div class="card"><div>📊 Basınç</div><div class="value" id="pressure">--</div><div class="note">hPa</div></div>
+  <div class="card"><div>👁️ Görüş</div><div class="value" id="visibility">--</div><div class="note">km</div></div>
+</section>
+</main>
 
-      <article class="metric">
-        <div class="label">💨 Rüzgar</div>
-        <div class="value" id="wind">-- km/s</div>
-        <div class="note" id="windDir">Yön yükleniyor</div>
-      </article>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let map,marker,radarLayer,lastCoords=null,frames=[],host="",idx=0,timer=null,playing=true;
 
-      <article class="metric">
-        <div class="label">🌧️ Yağış</div>
-        <div class="value" id="rain">-- mm</div>
-        <div class="note">Bugünkü toplam</div>
-      </article>
+const el=id=>document.getElementById(id);
+const txt={0:"Açık",1:"Çoğunlukla açık",2:"Parçalı bulutlu",3:"Bulutlu",45:"Sis",48:"Kırağılı sis",51:"Çisenti",61:"Hafif yağmur",63:"Yağmur",65:"Kuvvetli yağmur",80:"Sağanak",81:"Sağanak",82:"Kuvvetli sağanak",95:"Gök gürültülü fırtına",96:"Dolu ihtimalli fırtına",99:"Şiddetli fırtına"};
+function emo(c,d=1){if(c==0)return d?"☀️":"🌙";if([1,2].includes(c))return"🌤️";if(c==3)return"☁️";if([61,63,65,80,81,82].includes(c))return"🌧️";if([95,96,99].includes(c))return"⛈️";return"🌤️"}
+function windDir(deg){return["K","KD","D","GD","G","GB","B","KB"][Math.round(deg/45)%8]}
+function uvLabel(v){return v<=2?"Düşük":v<=5?"Orta":v<=7?"Yüksek":v<=10?"Çok yüksek":"Aşırı"}
 
-      <article class="metric">
-        <div class="label">☀️ UV</div>
-        <div class="value" id="uv">--</div>
-        <div class="note">Bugün maksimum</div>
-      </article>
-    </section>
+async function place(lat,lon){
+ const r=await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=tr&format=json`);
+ const d=await r.json(); const f=d.results?.[0];
+ return f?[f.name,f.admin1,f.country].filter(Boolean).join(", "):"Bulunduğun konum";
+}
 
-    <div class="footer-note">SkyGlass canlı veri sürümü</div>
-  </main>
+async function weather(lat,lon){
+ const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_direction_10m,is_day,weather_code,precipitation,surface_pressure,visibility&hourly=temperature_2m,precipitation_probability,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_sum&timezone=auto&forecast_days=10`;
+ const r=await fetch(url); return r.json();
+}
 
-  <script>
-    const el = id => document.getElementById(id);
+function smart(c,d){
+ let a=[],level="ok";
+ if([95,96,99].includes(c.weather_code)){a.push("⛈️ Gök gürültülü fırtına riski var.");level="bad"}
+ if(c.wind_speed_10m>=40){a.push("💨 Kuvvetli rüzgar var.");level="bad"}
+ else if(c.wind_speed_10m>=25){a.push("💨 Rüzgar belirgin kuvvetli.");if(level!="bad")level="warn"}
+ if((c.precipitation||0)>0.1){a.push("🌧️ Şu anda yağış var.");if(level!="bad")level="warn"}
+ if((d.uv_index_max?.[0]||0)>=8){a.push("☀️ UV çok yüksek.");if(level!="bad")level="warn"}
+ if(!a.length)a.push("Şu anda kritik uyarı görünmüyor.");
+ return {text:a.join(" "),level};
+}
 
-    const weatherTextTR = {
-      0: "Açık",
-      1: "Çoğunlukla açık",
-      2: "Parçalı bulutlu",
-      3: "Bulutlu",
-      45: "Sisli",
-      48: "Kırağılı sis",
-      51: "Hafif çisenti",
-      53: "Çisenti",
-      55: "Yoğun çisenti",
-      56: "Donan hafif çisenti",
-      57: "Donan yoğun çisenti",
-      61: "Hafif yağmur",
-      63: "Yağmur",
-      65: "Kuvvetli yağmur",
-      66: "Donan hafif yağmur",
-      67: "Donan yoğun yağmur",
-      71: "Hafif kar",
-      73: "Kar",
-      75: "Yoğun kar",
-      77: "Kar taneleri",
-      80: "Hafif sağanak",
-      81: "Sağanak",
-      82: "Kuvvetli sağanak",
-      85: "Hafif kar sağanağı",
-      86: "Yoğun kar sağanağı",
-      95: "Gök gürültülü fırtına",
-      96: "Dolu ihtimalli fırtına",
-      99: "Şiddetli dolulu fırtına"
-    };
+function renderHourly(h){
+ el("hourly").innerHTML="";
+ let start=h.time.findIndex(t=>new Date(t)>=new Date()); if(start<0)start=0;
+ for(let i=start;i<Math.min(start+10,h.time.length);i++){
+  const div=document.createElement("div"); div.className="hour";
+  div.innerHTML=`<div>${new Date(h.time[i]).toLocaleTimeString("tr-TR",{hour:"2-digit"})}</div><div style="font-size:24px">${emo(h.weather_code[i],h.is_day[i])}</div><b>${Math.round(h.temperature_2m[i])}°</b><div class="note">%${Math.round(h.precipitation_probability[i]||0)}</div>`;
+  el("hourly").appendChild(div);
+ }
+}
 
-    function weatherEmoji(code, isDay = 1) {
-      if (code === 0) return isDay ? "☀️" : "🌙";
-      if ([1,2].includes(code)) return isDay ? "🌤️" : "☁️";
-      if (code === 3) return "☁️";
-      if ([45,48].includes(code)) return "🌫️";
-      if ([51,53,55,56,57].includes(code)) return "🌦️";
-      if ([61,63,65,66,67,80,81,82].includes(code)) return "🌧️";
-      if ([71,73,75,77,85,86].includes(code)) return "❄️";
-      if ([95,96,99].includes(code)) return "⛈️";
-      return "🌤️";
-    }
+async function renderRadar(lat,lon){
+ if(!map){
+  map=L.map("map",{zoomControl:false}).setView([lat,lon],7);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:""}).addTo(map);
+  marker=L.marker([lat,lon]).addTo(map);
+ }else{map.setView([lat,lon],7);marker.setLatLng([lat,lon])}
+ const r=await fetch("https://api.rainviewer.com/public/weather-maps.json");
+ const data=await r.json(); host=data.host; frames=data.radar.past||[];
+ el("timeline").max=frames.length-1;
+ drawFrame();
+ if(timer)clearInterval(timer);
+ timer=setInterval(()=>{if(playing)nextFrame()},800);
+ setTimeout(()=>map.invalidateSize(),300);
+}
+function drawFrame(){
+ if(!frames.length)return;
+ if(radarLayer)map.removeLayer(radarLayer);
+ radarLayer=L.tileLayer(`${host}${frames[idx].path}/256/{z}/{x}/{y}/2/1_1.png`,{opacity:.65}).addTo(map);
+ el("timeline").value=idx;
+}
+function nextFrame(){idx=(idx+1)%frames.length;drawFrame()}
+function prevFrame(){idx=(idx-1+frames.length)%frames.length;drawFrame()}
+function setFrame(v){idx=parseInt(v);drawFrame()}
+function togglePlay(){playing=!playing;el("playBtn").textContent=playing?"⏸":"▶️"}
 
-    function windDirectionText(deg) {
-      const dirs = ["K", "KD", "D", "GD", "G", "GB", "B", "KB"];
-      return dirs[Math.round(deg / 45) % 8];
-    }
+async function load(lat,lon){
+ lastCoords={lat,lon}; el("status").textContent="Veriler alınıyor…";
+ const [p,w]=await Promise.all([place(lat,lon).catch(()=>"Konum"),weather(lat,lon)]);
+ const c=w.current,d=w.daily,uv=Math.round(d.uv_index_max[0]||0),al=smart(c,d);
+ el("city").textContent=p; el("icon").textContent=emo(c.weather_code,c.is_day);
+ el("temp").textContent=Math.round(c.temperature_2m)+"°"; el("summary").textContent=txt[c.weather_code]||"Hava durumu";
+ el("meta").textContent=`G: ${Math.round(d.temperature_2m_max[0])}° / D: ${Math.round(d.temperature_2m_min[0])}° · Hissedilen ${Math.round(c.apparent_temperature)}°`;
+ el("wind").textContent=Math.round(c.wind_speed_10m)+" km/s"; el("windDir").textContent=windDir(c.wind_direction_10m)+" yönü";
+ el("rain").textContent=(c.precipitation||0).toFixed(1)+" mm"; el("uv").textContent=uv; el("uvNote").textContent=uvLabel(uv);
+ el("humidity").textContent=Math.round(c.relative_humidity_2m)+"%"; el("pressure").textContent=Math.round(c.surface_pressure)+" hPa";
+ el("visibility").textContent=((c.visibility||0)/1000).toFixed(1)+" km";
+ el("smartAlert").textContent=al.text; el("alertBox").className="card alert "+al.level;
+ renderHourly(w.hourly); renderRadar(lat,lon); el("status").textContent="Ultimate SkyGlass güncellendi.";
+}
 
-    function bgForCode(code, isDay = 1) {
-      if (!isDay) {
-        document.body.style.background =
-          "radial-gradient(circle at top left, rgba(255,255,255,0.14), transparent 30%), linear-gradient(180deg, #17305d 0%, #273d85 42%, #39285f 100%)";
-        return;
-      }
-      if ([61,63,65,66,67,80,81,82].includes(code)) {
-        document.body.style.background =
-          "radial-gradient(circle at top left, rgba(255,255,255,0.12), transparent 30%), linear-gradient(180deg, #587aa1 0%, #5f76b1 45%, #725d99 100%)";
-        return;
-      }
-      if ([1,2,3,45,48].includes(code)) {
-        document.body.style.background =
-          "radial-gradient(circle at top left, rgba(255,255,255,0.16), transparent 30%), linear-gradient(180deg, #6d9ad9 0%, #7288c8 42%, #7d74b8 100%)";
-        return;
-      }
-      document.body.style.background =
-        "radial-gradient(circle at top left, rgba(255,255,255,0.20), transparent 30%), linear-gradient(180deg, #5aa2ff 0%, #6588ff 35%, #7a69f8 100%)";
-    }
-
-    async function reverseGeocode(lat, lon) {
-      const url = `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=tr&format=json`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Konum adı alınamadı");
-      const data = await res.json();
-      const first = data.results?.[0];
-      if (!first) return "Bulunduğun konum";
-      const parts = [first.name, first.admin1, first.country].filter(Boolean);
-      return parts.join(", ");
-    }
-
-    async function fetchWeather(lat, lon) {
-      const url =
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-        `&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_direction_10m,is_day,weather_code` +
-        `&hourly=temperature_2m,precipitation_probability,weather_code,is_day` +
-        `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max` +
-        `&timezone=auto&forecast_days=10`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Hava verisi alınamadı");
-      return res.json();
-    }
-
-    function renderHourly(hourly) {
-      const wrap = el("hourly");
-      wrap.innerHTML = "";
-      const now = new Date();
-      let startIndex = hourly.time.findIndex(t => new Date(t) >= now);
-      if (startIndex < 0) startIndex = 0;
-
-      const sliceCount = 8;
-      for (let i = startIndex; i < Math.min(startIndex + sliceCount, hourly.time.length); i++) {
-        const date = new Date(hourly.time[i]);
-        const timeText = date.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-        const emoji = weatherEmoji(hourly.weather_code[i], hourly.is_day[i]);
-        const temp = Math.round(hourly.temperature_2m[i]);
-
-        const item = document.createElement("div");
-        item.className = "hour";
-        item.innerHTML = `
-          <div class="time">${timeText}</div>
-          <div class="icon">${emoji}</div>
-          <div class="t">${temp}°</div>
-        `;
-        wrap.appendChild(item);
-      }
-    }
-
-    function renderDaily(daily) {
-      const wrap = el("daily");
-      wrap.innerHTML = "";
-
-      const lows = daily.temperature_2m_min;
-      const highs = daily.temperature_2m_max;
-      const minAll = Math.min(...lows);
-      const maxAll = Math.max(...highs);
-      const totalRange = Math.max(1, maxAll - minAll);
-
-      for (let i = 0; i < daily.time.length; i++) {
-        const d = new Date(daily.time[i]);
-        const day = i === 0
-          ? "Bugün"
-          : d.toLocaleDateString("tr-TR", { weekday: "short" });
-
-        const low = Math.round(lows[i]);
-        const high = Math.round(highs[i]);
-        const code = daily.weather_code[i];
-        const emoji = weatherEmoji(code, 1);
-
-        const left = ((low - minAll) / totalRange) * 100;
-        const width = ((high - low) / totalRange) * 100;
-
-        const row = document.createElement("div");
-        row.className = "day-row";
-        row.innerHTML = `
-          <div class="day-name">${day}</div>
-          <div>${emoji}</div>
-          <div class="day-low">${low}°</div>
-          <div class="track"><div class="fill" style="left:${left}%; width:${Math.max(width, 10)}%"></div></div>
-          <div class="day-high">${high}°</div>
-        `;
-        wrap.appendChild(row);
-      }
-    }
-
-    async function loadByCoords(lat, lon) {
-      el("status").textContent = "Veriler alınıyor…";
-      try {
-        const [place, weather] = await Promise.all([
-          reverseGeocode(lat, lon).catch(() => "Bulunduğun konum"),
-          fetchWeather(lat, lon)
-        ]);
-
-        const c = weather.current;
-        const d = weather.daily;
-
-        el("city").textContent = place;
-        el("temp").textContent = `${Math.round(c.temperature_2m)}°`;
-        el("summary").textContent = weatherTextTR[c.weather_code] || "Bilinmiyor";
-        el("meta").textContent =
-          `G: ${Math.round(d.temperature_2m_max[0])}° / D: ${Math.round(d.temperature_2m_min[0])}° · Hissedilen ${Math.round(c.apparent_temperature)}°`;
-
-        el("humidity").textContent = `${Math.round(c.relative_humidity_2m)}%`;
-        el("wind").textContent = `${Math.round(c.wind_speed_10m)} km/s`;
-        el("windDir").textContent = `${windDirectionText(c.wind_direction_10m)} yönü`;
-        el("rain").textContent = `${(d.precipitation_sum[0] ?? 0).toFixed(1)} mm`;
-        el("uv").textContent = `${Math.round(d.uv_index_max[0] ?? 0)}`;
-
-        bgForCode(c.weather_code, c.is_day);
-        renderHourly(weather.hourly);
-        renderDaily(weather.daily);
-
-        el("status").textContent = "Canlı veri yüklendi.";
-      } catch (err) {
-        el("status").textContent = err.message || "Bir hata oluştu.";
-      }
-    }
-
-    function initLocation() {
-      if (!("geolocation" in navigator)) {
-        el("status").textContent = "Bu tarayıcı konum özelliğini desteklemiyor.";
-        return;
-      }
-
-      el("status").textContent = "Konum izni bekleniyor…";
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const { latitude, longitude } = pos.coords;
-          loadByCoords(latitude, longitude);
-        },
-        err => {
-          if (err.code === 1) {
-            el("status").textContent = "Konum izni verilmedi.";
-          } else if (err.code === 2) {
-            el("status").textContent = "Konum bulunamadı.";
-          } else {
-            el("status").textContent = "Konum zaman aşımına uğradı.";
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000
-        }
-      );
-    }
-
-    el("locBtn").addEventListener("click", initLocation);
-  </script>
+function initLocation(){
+ navigator.geolocation.getCurrentPosition(p=>load(p.coords.latitude,p.coords.longitude),()=>el("status").textContent="Konum izni verilmedi.");
+}
+function refresh(){lastCoords?load(lastCoords.lat,lastCoords.lon):initLocation()}
+initLocation();
+setInterval(()=>{if(lastCoords)load(lastCoords.lat,lastCoords.lon)},300000);
+</script>
 </body>
 </html>
